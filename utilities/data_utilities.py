@@ -4,8 +4,6 @@ import pandas as pd
 import numpy as np
 import random
 from sklearn.utils import shuffle as skshuffle
-from operator import itemgetter
-
 
 class KnowledgeGraph:
 

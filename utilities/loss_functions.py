@@ -344,10 +344,10 @@ def rule_loss_complex_logicENN(self, groundings, lam, a):
             t3_i = Variable(torch.from_numpy(t3_i).cuda())
             p3_i = Variable(torch.from_numpy(p3_i).cuda())
     else:
-            h_i = Variable(torch.from_numpy(h_i))
-            t_i = Variable(torch.from_numpy(t_i))
-            p_i = Variable(torch.from_numpy(p_i))
-            s_i = Variable(torch.from_numpy(s_i))
+            h_i = Variable(torch.from_numpy(h1_i))
+            t_i = Variable(torch.from_numpy(t1_i))
+            p_i = Variable(torch.from_numpy(p1_i))
+            s_i = Variable(torch.from_numpy(s1_i))
 
     h1_e = self.emb_E(h1_i).view(-1, self.embedding_dim)
     t1_e = self.emb_E(t1_i).view(-1, self.embedding_dim)
