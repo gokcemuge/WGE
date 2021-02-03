@@ -85,7 +85,7 @@ def get_mse_pos(model, test_pos, test_batch_size, plot):
     with torch.no_grad():
         total_mse_pos = 0
         total_mae_pos = 0
-        test_triples = list(get_minibatches(test_pos, test_batch_size, shuffle=False))
+        test_triples = list(get_minibatches(test_pos, test_batch_size, shuffle=True))
         positive_test_triples_size = test_pos.shape[0]
         batch_no = 0
 
