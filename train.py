@@ -237,15 +237,12 @@ def train(name, out_file, model, data_dir, dim, batch_size,
                     try:
                         grounding_weights = grounding_batch[:, 3].astype(np.float64)
                         grounding_score = model.forward(grounding_batch)
-                        # TODO: clamp gerekebilir
                         rule_loss = WGE_rule_loss(model, grounding_weights, grounding_score)
 
                         loss = pos_loss + negative_loss + (rule_loss * rule_lam)
-
                     except:
                         break
 
-            # model.name == "NEW_rect" te forwardta bound kullanıldı!
             if model.name == "WGE_rect":
 
                 keys = list(zip(iter_triple[:, 0], iter_triple[:, 1], iter_triple[:, 2]))
