@@ -30,7 +30,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
 
     optimizer = torch.optim.Adam(model.parameters(), model.learning_rate)
 
-    if model.name == 'NEW_rect' or model.name == 'UKGE_rect' or model.name == 'NEW_rect_no_bound':
+    if model.name == 'UKGE_rect' or model.name == 'WGE_rect':
         reg = True
     else:
         reg = False
@@ -57,7 +57,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
     if model.name == 'transE' or model.name == 'complEx' or model.name == 'distmult':
         print("margin: ", margin)
 
-    if model.name == 'NEW_logi' or model.name == 'NEW_rect' or model.name == 'NEW_rect_no_bound':
+    if model.name == 'WGE_logi' or model.name == 'WGE_rect':
         print("lambda_1: ", lambda_1)
         print("lambda_2: ", lambda_2)
 
@@ -216,7 +216,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
 
                     loss = pos_loss + negative_loss + regularizer*reg_scale + psl_loss
 
-            if model.name == "NEW_logi":
+            if model.name == "WGE_logi":
 
                 keys = list(zip(iter_triple[:, 0], iter_triple[:, 1], iter_triple[:, 2]))
                 triple_idxs = list(itemgetter(*keys)(kg.triple2idx))  # select triples to be used in loss
@@ -228,8 +228,8 @@ def train(name, out_file, model, data_dir, dim, batch_size,
                 pos_score = model.forward(iter_triple)
                 neg_score = model.forward(iter_neg)  # when the model rect, bound is needed after forward
 
-                pos_loss, negative_loss = NEW_loss(model, pos_score, pos_weights, neg_score,
-                                                   epsilons_left_batch, epsilons_right_batch,lambda_1,lambda_2)
+                pos_loss, negative_loss = WGE_loss(model, pos_score, pos_weights, neg_score,
+                                                   epsilons_left_batch, epsilons_right_batch, lambda_1, lambda_2)
 
                 loss = pos_loss + negative_loss
 
@@ -238,7 +238,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
                         grounding_weights = grounding_batch[:, 3].astype(np.float64)
                         grounding_score = model.forward(grounding_batch)
                         # TODO: clamp gerekebilir
-                        rule_loss = NEW_rule_loss(model, grounding_weights, grounding_score)
+                        rule_loss = WGE_rule_loss(model, grounding_weights, grounding_score)
 
                         loss = pos_loss + negative_loss + (rule_loss * rule_lam)
 
@@ -246,7 +246,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
                         break
 
             # model.name == "NEW_rect" te forwardta bound kullanıldı!
-            if model.name == "NEW_rect" or model.name == "NEW_rect_no_bound":
+            if model.name == "WGE_rect":
 
                 keys = list(zip(iter_triple[:, 0], iter_triple[:, 1], iter_triple[:, 2]))
                 triple_idxs = list(itemgetter(*keys)(kg.triple2idx))  # select triples to be used in loss
@@ -260,8 +260,8 @@ def train(name, out_file, model, data_dir, dim, batch_size,
 
                 neg_score = model.forward(iter_neg)
 
-                pos_loss, negative_loss = NEW_loss(model, pos_score, pos_weights, neg_score,
-                                                   epsilons_left_batch, epsilons_right_batch,lambda_1,lambda_2)
+                pos_loss, negative_loss = WGE_loss(model, pos_score, pos_weights, neg_score,
+                                                   epsilons_left_batch, epsilons_right_batch, lambda_1, lambda_2)
 
                 loss = pos_loss + negative_loss + (regularizer * reg_scale)
 
@@ -272,7 +272,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
                         #TODO: check clamp on and of
                         grounding_score = torch.clamp(torch.clamp(grounding_score, max=1), min=0)
 
-                        rule_loss = NEW_rule_loss(model, grounding_weights, grounding_score)
+                        rule_loss = WGE_rule_loss(model, grounding_weights, grounding_score)
 
                         loss = pos_loss + negative_loss + (regularizer * reg_scale) + (rule_loss * rule_lam)
                     except:
@@ -422,7 +422,7 @@ if __name__ == '__main__':
     # parser.add_argument('--evaluate_train', action='store_true', help='Evaluate on training data')
     parser.add_argument('-out_file', "--output_file_name", default='training_results', help="Output file name", type=str)
 
-    parser.add_argument('-m', "--model_name", default='NEW_logi', help="Model name", type=str)
+    parser.add_argument('-m', "--model_name", default='WGE_logi', help="Model name", type=str)
     parser.add_argument('-data', "--dataset", default='sch40k', help="Dataset name",  type=str)
     parser.add_argument('-neg', '--negative_sample', default=10, type=int)
     parser.add_argument('-lr', '--learning_rate', default=0.001, help="learning rate", type=float)

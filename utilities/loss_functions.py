@@ -424,7 +424,7 @@ def UKGE_psl_loss(self, psl_weights, psl_scores):  # psl_prob gelir
     return psl_loss
 
 
-def NEW_loss(self, pos_scores, pos_weights, neg_scores, epsilons_left, epsilons_right, lambda_1, lambda_2):
+def WGE_loss(self, pos_scores, pos_weights, neg_scores, epsilons_left, epsilons_right, lambda_1, lambda_2):
 
     n_pos_scores = pos_scores.shape[1]
     n_neg_scores = neg_scores.shape[1]
@@ -475,11 +475,10 @@ def NEW_loss(self, pos_scores, pos_weights, neg_scores, epsilons_left, epsilons_
     return loss_positives, loss_negatives
 
 
-def NEW_rule_loss(self, grounding_weights, grounding_scores):
+def WGE_rule_loss(self, grounding_weights, grounding_scores):
 
     grounding_weights = torch.from_numpy(grounding_weights).view(1, -1).transpose(0, 1).cuda()
-    grounding_scores = grounding_scores.view(1, -1).transpose(0, 1) #check transpose!!!!!!!!!!!!!
-
+    grounding_scores = grounding_scores.view(1, -1).transpose(0, 1)
     rule_loss = torch.mean(self.relu(grounding_weights - grounding_scores))
 
     return rule_loss

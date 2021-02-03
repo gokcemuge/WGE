@@ -166,7 +166,7 @@ class Model(nn.Module):
                 regularizer = torch.mean(h ** 2) / 2 + torch.mean(t ** 2) / 2 + torch.mean(r ** 2) / 2
                 return out, regularizer
 
-        elif self.name == 'NEW_logi':  # same as ukge_logi  but without weight and bias
+        elif self.name == 'WGE_logi':  # same as ukge_logi  but without weight and bias
             h = self.emb_E(h_i).view(-1, self.embedding_dim)
             t = self.emb_E(t_i).view(-1, self.embedding_dim)
             r = self.emb_R(r_i).view(-1, self.embedding_dim)
@@ -175,28 +175,13 @@ class Model(nn.Module):
             out = self.sigmoid(plausibility)
             out = out.view(1, -1)
 
-        elif self.name == 'NEW_rect':  # same as ukge_rect  but without weight and bias
-            h = self.emb_E(h_i).view(-1, self.embedding_dim)  # h is embedding vector
-            t = self.emb_E(t_i).view(-1, self.embedding_dim)  # h_i index of head entity
-            r = self.emb_R(r_i).view(-1, self.embedding_dim)
-
-            plausibility = torch.sum(r * (h * t), dim=1)
-            # TODO: bounded here [ no need in the mse ]
-            out = torch.clamp(torch.clamp(plausibility, max=1), min=0)
-
-            # original implementation uses l2_loss for regularizer
-            if self.regul:
-                regularizer = torch.mean(h ** 2) / 2 + torch.mean(t ** 2) / 2 + torch.mean(r ** 2) / 2
-                return out, regularizer
-
-        elif self.name == 'NEW_rect_no_bound':  # same as ukge_rect but without weight and bias
+        elif self.name == 'WGE_rect':  # same as ukge_rect but without weight and bias
             h = self.emb_E(h_i).view(-1, self.embedding_dim)  # h is embedding vector
             t = self.emb_E(t_i).view(-1, self.embedding_dim)  # h_i index of head entity
             r = self.emb_R(r_i).view(-1, self.embedding_dim)
 
             plausibility = torch.sum(r * (h * t), dim=1)
             out = plausibility.view(1,-1)
-
 
             # TODO: bound not here but in the evaluation [in the mse ]
             # out = torch.clamp(torch.clamp(plausibility, max=1), min=0)
@@ -286,7 +271,7 @@ class Model(nn.Module):
             self.bias = torch.nn.Parameter(torch.zeros([1, 1], dtype=torch.float64).cuda())
             self.bias.requires_grad = True
 
-        elif self.name == 'NEW_rect' or self.name == 'NEW_rect_no_bound' or self.name == 'NEW_logi':
+        elif self.name == 'WGE_rect' or self.name == 'WGE_logi':
             self.emb_E = torch.nn.Embedding(self.kg.n_entity, self.embedding_dim, padding_idx=0).double()
             self.emb_R = torch.nn.Embedding(self.kg.n_relation, self.embedding_dim, padding_idx=0).double()
 
@@ -346,7 +331,7 @@ class Model(nn.Module):
             self.weight.data = torch.from_numpy(np.load(str(path) + str(self.name) + '_weight'+ '.npy')).cuda()
             self.bias.data = torch.from_numpy(np.load(str(path) + str(self.name) + '_bias'+ '.npy')).cuda()
 
-        if self.name == 'NEW_logi' or self.name == 'NEW_rect_no_bound':
+        if self.name == 'WGE_logi' or self.name == 'WGE_rect':
             self.emb_E.weight.data = torch.from_numpy(np.load(str(path) + str(self.name) + '_emb_E'+ '.npy')).cuda()
             self.emb_R.weight.data = torch.from_numpy(np.load(str(path) + str(self.name) + '_emb_R'+ '.npy')).cuda()
             self.epsilons_left.weight.data = torch.from_numpy(np.load(str(path) + str(self.name) + '_epsilons_left'+ '.npy')).cuda()
@@ -377,7 +362,7 @@ class Model(nn.Module):
             np.save(str(path) + str(self.name) + '_weight' + str(epoch), weight)
             np.save(str(path) + str(self.name) + '_bias' + str(epoch), bias)
 
-        if self.name == 'NEW_logi' or self.name == 'NEW_rect_no_bound':
+        if self.name == 'WGE_logi' or self.name == 'WGE_rect':
             emb_E = self.emb_E.weight.detach().cpu().numpy()
             emb_R = self.emb_R.weight.detach().cpu().numpy()
             epsilons_left = self.epsilons_left.weight.detach().cpu().numpy()

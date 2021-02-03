@@ -89,7 +89,7 @@ def get_mse_pos(model, test_pos, test_batch_size, plot):
         positive_test_triples_size = test_pos.shape[0]
         batch_no = 0
 
-        if model.name == 'UKGE_logi' or model.name == 'NEW_logi':
+        if model.name == 'UKGE_logi' or model.name == 'WGE_logi':
             for iter_triple in test_triples:
                 test_pos_weights = iter_triple[:, 3].astype(np.float64)
                 test_pos_score = model.forward(iter_triple)
@@ -108,29 +108,7 @@ def get_mse_pos(model, test_pos, test_batch_size, plot):
                 if np.asarray(iter_triple).shape[0] < test_batch_size:
                     break
 
-        elif model.name == 'NEW_rect':
-            for iter_triple in test_triples:
-                test_pos_weights = iter_triple[:, 3].astype(np.float64)
-                test_pos_score = model.forward(iter_triple)
-
-                # bound -  bounded in the calculate_score part(forward)
-                # test_pos_score = torch.clamp(torch.clamp(test_pos_score, max=1), min=0)  # checked
-
-                test_pos_weights = torch.from_numpy(test_pos_weights).view(1, -1).transpose(0, 1).cuda()
-                test_pos_score = test_pos_score.view(1, -1).transpose(0, 1)
-
-                if plot:
-                    plot_mse_pos(test_pos_score, test_pos_weights, batch_no)
-                    batch_no = batch_no + 1
-
-                mse = torch.sum((test_pos_score - test_pos_weights) ** 2)
-                mae = torch.sum(torch.abs(test_pos_score - test_pos_weights))
-                total_mse_pos = total_mse_pos + mse
-                total_mae_pos = total_mae_pos + mae
-                if np.asarray(iter_triple).shape[0] < test_batch_size:
-                    break
-
-        elif model.name == 'NEW_rect_no_bound' or model.name == 'UKGE_rect':
+        elif model.name == 'WGE_rect' or model.name == 'UKGE_rect':
             for iter_triple in test_triples:
                 test_pos_weights = iter_triple[:, 3].astype(np.float64)
                 test_pos_score = model.forward(iter_triple)
@@ -172,7 +150,7 @@ def get_mse_neg(model, test_pos, test_batch_size, negsample_num, entitiy_list, f
     negative_test_triples_size = test_pos.shape[0] * negsample_num * 2
     batch_no = 0
     with torch.no_grad():
-        if model.name == 'UKGE_logi' or model.name == 'NEW_logi':
+        if model.name == 'UKGE_logi' or model.name == 'WGE_logi':
             for iter_triple in test_triples:
 
                 iter_neg = sample_negatives_only(iter_triple, negsample_num, entitiy_list, filter_triples) # negsample_num is ok
@@ -192,27 +170,7 @@ def get_mse_neg(model, test_pos, test_batch_size, negsample_num, entitiy_list, f
                 if np.asarray(iter_triple).shape[0] < test_batch_size:
                     break
 
-        if model.name == 'NEW_rect':
-            for iter_triple in test_triples:
-
-                iter_neg = sample_negatives_only(iter_triple, negsample_num, entitiy_list, filter_triples)  # negsample_num is ok
-                test_neg_score = model.forward(iter_neg)
-
-                #  bound - bounded in the calculate_score part(forward)
-                # test_neg_score = torch.clamp(torch.clamp(test_neg_score, max=1), min=0) # checked
-                if plot:
-                    plot_mse_neg(test_neg_score, batch_no)
-                    batch_no = batch_no + 1
-
-                test_neg_score = test_neg_score.view(negsample_num*2, -1).transpose(0, 1)  # negsample_num is ok
-                mse = torch.sum((test_neg_score - 0) ** 2)
-                mae = torch.sum(torch.abs(test_neg_score - 0))
-
-                total_mse_neg = total_mse_neg + mse
-                total_mae_neg = total_mae_neg + mae
-                if np.asarray(iter_triple).shape[0] < test_batch_size:
-                    break
-        if model.name == 'NEW_rect_no_bound' or model.name == 'UKGE_rect':
+        if model.name == 'WGE_rect' or model.name == 'UKGE_rect':
             for iter_triple in test_triples:
 
                 iter_neg = sample_negatives_only(iter_triple, negsample_num, entitiy_list, filter_triples)  # negsample_num is ok
@@ -376,10 +334,10 @@ class Evaluation(object):
             scores_global = model.calculate_score(heads_global, tails_global, rels_global).cpu() # head tail relation !
             keys_global = list(map(lambda i, j, k: int(str(i) + str(j) + str(k)), heads_global, tails_global, rels_global))
 
-            if model.name == 'NEW_logi' or model.name == 'UKGE_logi':
+            if model.name == 'WGE_logi' or model.name == 'UKGE_logi':
                 ranks_global = rankdata(-scores_global, method='ordinal')
 
-            if model.name == 'NEW_rect_no_bound' or model.name == 'UKGE_rect':
+            if model.name == 'WGE_rect' or model.name == 'UKGE_rect':
                 # bound needed here for the evaluations
                 scores_global = torch.clamp(torch.clamp(scores_global, max=1), min=0)
                 ranks_global = rankdata(-scores_global, method='ordinal')
