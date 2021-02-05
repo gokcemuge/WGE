@@ -99,8 +99,9 @@ def train(name, out_file, model, data_dir, dim, batch_size,
     if train_with_psl:
         psl_loss = 0
         psl_triples_all = np.array(kg.psl_triples)
+        psl_batch_size_new = len(psl_triples_all) // (kg.n_training_triple // batch_size)+ 1
 
-        psl_batch_size_new = len(psl_triples_all) // (kg.n_training_triple // batch_size)
+
 
     if train_with_groundings:
         rule_loss = 0
@@ -186,7 +187,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
 
                 if model.train_with_psl:
                     # one psl_triple [h,t,r,w]
-                    psl_batch_size = 1
+                    psl_batch_size = psl_batch_size_new
                     psl_triples_batch = gen_psl_samples(psl_triples_all, psl_batch_size)
                     psl_weights = psl_triples_batch[:, 3].astype(np.float64)
 
@@ -206,7 +207,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
 
                 if model.train_with_psl:
                     # one psl_triple [h,t,r,w]
-                    psl_batch_size = 1
+                    psl_batch_size = psl_batch_size_new
                     psl_triples_batch = gen_psl_samples(psl_triples_all, psl_batch_size)
                     psl_weights = psl_triples_batch[:, 3].astype(np.float64)
 
