@@ -100,14 +100,14 @@ class Model(nn.Module):
 
         elif self.name == 'rescal':
 
-            h = self.emb_E(h_i).view(-1, self.embedding_dim, 1)
+            h = self.emb_E(h_i).view(-1, self.embedding_dim)
             t = self.emb_E(t_i).view(-1, self.embedding_dim, 1)
             r = self.emb_R(r_i).view(-1, self.embedding_dim, self.embedding_dim)
 
             tr = torch.matmul(r, t)
             tr = tr.view(-1, self.embedding_dim)
             #out = -torch.sum(h * tr, -1)
-            out = torch.sum(h * tr, -1)
+            out = torch.sum(h * tr, dim=-1)
 
             if self.regul:
                 regul = (torch.mean(h ** 2) + torch.mean(t ** 2) + torch.mean(r ** 2)) / 3
