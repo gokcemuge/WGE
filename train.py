@@ -621,7 +621,7 @@ if __name__ == '__main__':
     load_model = True
     '''
 
-
+    '''
     model_name = "rescal"
    # model_name = "UKGE_logi"
     plot = False
@@ -640,5 +640,6 @@ if __name__ == '__main__':
     ndcg_check = True
     train_with_psl = False
     train_with_groundings = False
+    '''
 
     main()
