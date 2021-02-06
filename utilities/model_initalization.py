@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import torch.nn as nn
-from torch.nn.init import xavier_normal_
+from torch.nn.init import xavier_normal_, xavier_uniform_
 from torch.nn import functional as F
 from torch.autograd import Variable
 #from utilities.model_initialization import *
@@ -97,6 +97,23 @@ class Model(nn.Module):
                 return out, self.regul
 
             return out
+
+        elif self.name == 'rescal':
+
+            h = self.emb_E(h_i).view(-1, self.embedding_dim, 1)
+            t = self.emb_E(t_i).view(-1, self.embedding_dim, 1)
+            r = self.emb_R(r_i).view(-1, self.embedding_dim, self.embedding_dim)
+
+            tr = torch.matmul(r, t)
+            tr = tr.view(-1, self.embedding_dim)
+            #out = -torch.sum(h * tr, -1)
+            out = torch.sum(h * tr, -1)
+
+            if self.regul:
+                regul = (torch.mean(h ** 2) + torch.mean(t ** 2) + torch.mean(r ** 2)) / 3
+                return out, self.regul
+            return out
+
 
         elif self.name == 'complEx':
             head = self.emb_E(h_i).view(-1, self.embedding_dim)
@@ -231,6 +248,12 @@ class Model(nn.Module):
             self.embeddings = [self.emb_E, self.emb_R]
             xavier_normal_(self.emb_E.weight.data)
             xavier_normal_(self.emb_R.weight.data)
+
+        elif self.name == 'rescal':
+            self.emb_E = nn.Embedding(self.kg.n_entity, self.embedding_dim)
+            self.emb_R = nn.Embedding(self.kg.n_relation, self.embedding_dim*self.embedding_dim)
+            xavier_uniform_(self.emb_E.weight.data)
+            xavier_uniform_(self.emb_R.weight.data)
 
         elif self.name == 'transE':
             self.emb_E = torch.nn.Embedding(self.kg.n_entity, self.embedding_dim, padding_idx=0)

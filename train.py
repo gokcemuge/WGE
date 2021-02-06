@@ -54,7 +54,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
     print("negative sampling size: ", negative_sample * 2)
     print("rule coefficient: ", rule_lam)
 
-    if model.name == 'transE' or model.name == 'complEx' or model.name == 'distmult':
+    if model.name == 'transE' or model.name == 'complEx' or model.name == 'distmult' or model.name == 'rescal':
         print("margin: ", margin)
 
     if model.name == 'WGE_logi' or model.name == 'WGE_rect':
@@ -78,7 +78,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
 
     strong_threshold = 0.85
 
-    if model.name == 'transE' or model.name == 'complEx' or model.name == 'distmult':
+    if model.name == 'transE' or model.name == 'complEx' or model.name == 'distmult' or model.name == 'rescal':
         # print("train, test, val data is filtered")
 
         train_pos_org = train_pos
@@ -121,7 +121,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
         val_start_time = time.time()
         model.eval()
 
-        if model.name == "transE" or model.name == 'distmult' or model.name == 'complEx':
+        if model.name == "transE" or model.name == 'distmult' or model.name == 'complEx' or model.name == 'rescal':
             with torch.no_grad():
                 decision_tree_classify(model, strong_threshold, train_pos_org, test_pos_org, test_neg)
 
@@ -276,7 +276,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
                     except:
                         break
 
-            if model.name == "transE" or model.name == 'distmult' or model.name == 'complEx':
+            if model.name == "transE" or model.name == 'distmult' or model.name == 'complEx' or model.name == 'rescal':
                 pos_score = model.forward(iter_triple)  # same as f_prob_h
                 neg_score = model.forward(iter_neg)  # same as (f_prob_hn , f_prob_tn)
 
@@ -321,7 +321,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
             neg_loss_print,
             epoch_duration))
 
-        if model.name == "transE" or model.name == 'distmult' or model.name == 'complEx':
+        if model.name == "transE" or model.name == 'distmult' or model.name == 'complEx' or model.name == 'rescal':
             if (epoch + 1) % validate_epoch == 0:
                 val_start_time = time.time()
                 model.eval()
