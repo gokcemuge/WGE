@@ -391,8 +391,12 @@ def rule_loss_complex_logicENN(self, groundings, lam, a):
 
 
 def UKGE_main_loss(self, pos_score, pos_weights, neg_score): # f_prob_h ve f_prob_hn&tn gelir
-    n_pos_score = pos_score.shape[1]
-    n_neg_score = neg_score.shape[1]
+    if self.name == 'rescal':
+        n_pos_score = pos_score.shape[0]
+        n_neg_score = neg_score.shape[0]
+    else:
+        n_pos_score = pos_score.shape[1]
+        n_neg_score = neg_score.shape[1]
     n_neg_sample = int(n_neg_score / n_pos_score)
 
     positive_weight = torch.from_numpy(pos_weights).view(1,-1).transpose(0,1).cuda()

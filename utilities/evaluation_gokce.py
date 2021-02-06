@@ -89,7 +89,7 @@ def get_mse_pos(model, test_pos, test_batch_size, plot):
         positive_test_triples_size = test_pos.shape[0]
         batch_no = 0
 
-        if model.name == 'UKGE_logi' or model.name == 'WGE_logi':
+        if model.name == 'UKGE_logi' or model.name == 'WGE_logi' or model.name=='rescal':
             for iter_triple in test_triples:
                 test_pos_weights = iter_triple[:, 3].astype(np.float64)
                 test_pos_score = model.forward(iter_triple)
@@ -150,7 +150,7 @@ def get_mse_neg(model, test_pos, test_batch_size, negsample_num, entitiy_list, f
     negative_test_triples_size = test_pos.shape[0] * negsample_num * 2
     batch_no = 0
     with torch.no_grad():
-        if model.name == 'UKGE_logi' or model.name == 'WGE_logi':
+        if model.name == 'UKGE_logi' or model.name == 'WGE_logi' or model.name=='rescal':
             for iter_triple in test_triples:
 
                 iter_neg = sample_negatives_only(iter_triple, negsample_num, entitiy_list, filter_triples) # negsample_num is ok

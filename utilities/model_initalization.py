@@ -98,23 +98,6 @@ class Model(nn.Module):
 
             return out
 
-        elif self.name == 'rescal':
-
-            h = self.emb_E(h_i).view(-1, self.embedding_dim)
-            t = self.emb_E(t_i).view(-1, self.embedding_dim, 1)
-            r = self.emb_R(r_i).view(-1, self.embedding_dim, self.embedding_dim)
-
-            tr = torch.matmul(r, t)
-            tr = tr.view(-1, self.embedding_dim)
-            #out = -torch.sum(h * tr, -1)
-            out = torch.sum(h * tr, dim=-1)
-
-            if self.regul:
-                regul = (torch.mean(h ** 2) + torch.mean(t ** 2) + torch.mean(r ** 2)) / 3
-                return out, self.regul
-            return out
-
-
         elif self.name == 'complEx':
             head = self.emb_E(h_i).view(-1, self.embedding_dim)
             tail = self.emb_E(t_i).view(-1, self.embedding_dim)
@@ -161,6 +144,22 @@ class Model(nn.Module):
 
             out = out.view(-1, 1)
 
+        elif self.name == 'rescal':
+
+            h = self.emb_E(h_i).view(-1, self.embedding_dim)
+            t = self.emb_E(t_i).view(-1, self.embedding_dim, 1)
+            r = self.emb_R(r_i).view(-1, self.embedding_dim, self.embedding_dim)
+
+            tr = torch.matmul(r, t)
+            tr = tr.view(-1, self.embedding_dim)
+            #out = -torch.sum(h * tr, -1)
+            out = torch.sum(h * tr, dim=1)
+
+            if self.regul:
+                regul = (torch.mean(h ** 2) + torch.mean(t ** 2) + torch.mean(r ** 2)) / 3
+                return out, self.regul
+            return out
+
         elif self.name == 'UKGE_logi':
             h = self.emb_E(h_i).view(-1, self.embedding_dim)
             t = self.emb_E(t_i).view(-1, self.embedding_dim)
@@ -188,7 +187,7 @@ class Model(nn.Module):
             t = self.emb_E(t_i).view(-1, self.embedding_dim)
             r = self.emb_R(r_i).view(-1, self.embedding_dim)
 
-            plausibility = torch.sum(r * (h * t), dim=1)
+            plausibility = torch.sum(r * (h * t), dim=1)  # DistMult
             out = self.sigmoid(plausibility)
             out = out.view(1, -1)
 
@@ -199,11 +198,9 @@ class Model(nn.Module):
 
             plausibility = torch.sum(r * (h * t), dim=1)
             out = plausibility.view(1,-1)
-
             # TODO: bound not here but in the evaluation [in the mse ]
             # out = torch.clamp(torch.clamp(plausibility, max=1), min=0)
 
-            # original implementation uses l2_loss for regularizer
             if self.regul:
                 regularizer = torch.mean(h ** 2) / 2 + torch.mean(t ** 2) / 2 + torch.mean(r ** 2) / 2
                 return out, regularizer
