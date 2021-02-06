@@ -54,7 +54,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
     print("negative sampling size: ", negative_sample * 2)
     print("rule coefficient: ", rule_lam)
 
-    if model.name == 'transE' or model.name == 'complEx' or model.name == 'distmult' or model.name == 'rescal':
+    if model.name == 'transE' or model.name == 'complEx' or model.name == 'distmult':
         print("margin: ", margin)
 
     if model.name == 'WGE_logi' or model.name == 'WGE_rect':
@@ -78,7 +78,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
 
     strong_threshold = 0.85
 
-    if model.name == 'transE' or model.name == 'complEx' or model.name == 'distmult' or model.name == 'rescal':
+    if model.name == 'transE' or model.name == 'complEx' or model.name == 'distmult':
         # print("train, test, val data is filtered")
 
         train_pos_org = train_pos
@@ -121,7 +121,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
         val_start_time = time.time()
         model.eval()
 
-        if model.name == "transE" or model.name == 'distmult' or model.name == 'complEx' or model.name == 'rescal':
+        if model.name == "transE" or model.name == 'distmult' or model.name == 'complEx':
             with torch.no_grad():
                 decision_tree_classify(model, strong_threshold, train_pos_org, test_pos_org, test_neg)
 
@@ -177,6 +177,12 @@ def train(name, out_file, model, data_dir, dim, batch_size,
 
             iter_neg = sample_negatives_only(iter_triple, negative_sample, entity_list, kg.all_pos_but_test_triples)
             pos_weights = iter_triple[:, 3].astype(np.float64)
+
+            if model.name == 'rescal':
+                pos_score = model.forward(iter_triple)  # same as f_prob_h
+                neg_score = model.forward(iter_neg)  # same as (f_prob_hn , f_prob_tn)
+                pos_loss, negative_loss = UKGE_main_loss(model, pos_score, pos_weights, neg_score)
+                loss = pos_loss + negative_loss
 
             if model.name == "UKGE_logi":
 
@@ -276,7 +282,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
                     except:
                         break
 
-            if model.name == "transE" or model.name == 'distmult' or model.name == 'complEx' or model.name == 'rescal':
+            if model.name == "transE" or model.name == 'distmult' or model.name == 'complEx':
                 pos_score = model.forward(iter_triple)  # same as f_prob_h
                 neg_score = model.forward(iter_neg)  # same as (f_prob_hn , f_prob_tn)
 
@@ -321,7 +327,7 @@ def train(name, out_file, model, data_dir, dim, batch_size,
             neg_loss_print,
             epoch_duration))
 
-        if model.name == "transE" or model.name == 'distmult' or model.name == 'complEx' or model.name == 'rescal':
+        if model.name == "transE" or model.name == 'distmult' or model.name == 'complEx':
             if (epoch + 1) % validate_epoch == 0:
                 val_start_time = time.time()
                 model.eval()
@@ -615,10 +621,11 @@ if __name__ == '__main__':
     load_model = True
     '''
 
-    ''' 
-    model_name = "UKGE_logi"
-    plot = True
-    load_model = True
+
+    model_name = "rescal"
+   # model_name = "UKGE_logi"
+    plot = False
+    load_model = False
     data_dir = "dataset/" + "aida35k"
 
     lr = 0.001
@@ -633,5 +640,5 @@ if __name__ == '__main__':
     ndcg_check = True
     train_with_psl = False
     train_with_groundings = False
-    '''
+
     main()
