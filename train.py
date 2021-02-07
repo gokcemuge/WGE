@@ -202,6 +202,16 @@ def train(name, out_file, model, data_dir, dim, batch_size,
 
                     loss = pos_loss + negative_loss + psl_loss
 
+                if model.train_with_groundings:
+                    try:
+                        grounding_weights = grounding_batch[:, 3].astype(np.float64)
+                        grounding_score = model.forward(grounding_batch)
+                        rule_loss = WGE_rule_loss(model, grounding_weights, grounding_score)
+
+                        loss = pos_loss + negative_loss + (rule_loss * rule_lam)
+                    except:
+                        break
+
             if model.name == "UKGE_rect":  # TODO: not: rect no bound versiyonu zaten bu
                 model.regul = True
                 pos_score, regularizer = model.forward(iter_triple)  # same as f_prob_h
@@ -222,6 +232,19 @@ def train(name, out_file, model, data_dir, dim, batch_size,
                     psl_loss = UKGE_psl_loss(model, psl_weights, psl_scores)
 
                     loss = pos_loss + negative_loss + regularizer*reg_scale + psl_loss
+
+                if model.train_with_groundings:
+                    try:
+                        grounding_weights = grounding_batch[:, 3].astype(np.float64)
+                        grounding_score = model.forward(grounding_batch)
+                        # TODO: check clamp on and of
+                        grounding_score = torch.clamp(torch.clamp(grounding_score, max=1), min=0)
+
+                        rule_loss = WGE_rule_loss(model, grounding_weights, grounding_score)
+
+                        loss = pos_loss + negative_loss + (regularizer * reg_scale) + (rule_loss * rule_lam)
+                    except:
+                        break
 
             if model.name == "WGE_logi":
 
