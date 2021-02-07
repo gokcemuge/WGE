@@ -68,6 +68,11 @@ def train(name, out_file, model, data_dir, dim, batch_size,
 
     print("load_model: ", model.load_model)
     print("save_model: ", model.save_model)
+
+    strong_threshold = 0.85
+    if kg.dataset_name == 'ppi5k':
+        strong_threshold = 0.70
+    print("threshold for strong facts: ", strong_threshold)
     print(". . . . ")
 
     entity_list = list(kg.id2ent_dict.keys())  # kg.entity_dict  = id to entity
@@ -75,8 +80,6 @@ def train(name, out_file, model, data_dir, dim, batch_size,
     train_pos = np.array(kg.training_triples)
     test_pos = np.array(kg.test_triples)
     val_pos = np.array(kg.validation_triples)
-
-    strong_threshold = 0.85
 
     if model.name == 'transE' or model.name == 'complEx' or model.name == 'distmult':
         # print("train, test, val data is filtered")
@@ -450,7 +453,7 @@ if __name__ == '__main__':
     parser.add_argument('-out_file', "--output_file_name", default='training_results', help="Output file name", type=str)
 
     parser.add_argument('-m', "--model_name", default='WGE_logi', help="Model name", type=str)
-    parser.add_argument('-data', "--dataset", default='sch40k', help="Dataset name",  type=str)
+    parser.add_argument('-data', "--dataset", default='aida35k', help="Dataset name",  type=str)
     parser.add_argument('-neg', '--negative_sample', default=10, type=int)
     parser.add_argument('-lr', '--learning_rate', default=0.001, help="learning rate", type=float)
     parser.add_argument("-dim", "--dimension", default=128, help="dimension size of embeddings", type=int)
