@@ -42,14 +42,14 @@ def plot_mse_pos(test_pos_score, test_pos_weights, batch_no):
     plt.savefig(plot_dir)
     plt.clf()
 
-    file_name = 'plots/mse_pos_val_batch_' + str(batch_no)
+    file_name = 'mse_pos_val_batch_' + str(batch_no)
     triple_no = triple_numbers[:120]
     weight_no = weights[:120]
     score_no = scores[:120]
 
-    np.save('plots/triples' + str(file_name) + '_triples', triple_no )
-    np.save('plots/weights' + str(file_name) + '_weights', weight_no)
-    np.save('plots/scores' + str(file_name) + '_scores', score_no)
+    np.save('plots/triples/' + str(file_name) + '_triples', triple_no )
+    np.save('plots/weights/' + str(file_name) + '_weights', weight_no)
+    np.save('plots/scores/' + str(file_name) + '_scores', score_no)
     return
 
 
