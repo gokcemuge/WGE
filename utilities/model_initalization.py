@@ -357,7 +357,7 @@ class Model(nn.Module):
             self.epsilons_left.weight.data = torch.from_numpy(np.load(str(path) + str(self.name) + '_epsilons_left'+ '.npy')).cuda()
             self.epsilons_right.weight.data = torch.from_numpy(np.load(str(path) + str(self.name) + '_epsilons_right'+ '.npy')).cuda()
 
-        if self.name == "transE" or self.name == 'distmult' or self.name == 'complEx':
+        if self.name == "transE" or self.name == 'distmult' or self.name == 'complEx' or self.name == 'rescal':
             self.emb_E.weight.data = torch.from_numpy(np.load(str(path) + str(self.name) + '_emb_E' + '.npy')).cuda()
             self.emb_R.weight.data = torch.from_numpy(np.load(str(path) + str(self.name) + '_emb_R' + '.npy')).cuda()
 
@@ -393,7 +393,7 @@ class Model(nn.Module):
             np.save(str(path) + str(self.name) + '_epsilons_left_' + str(epoch), epsilons_left)
             np.save(str(path) + str(self.name) + '_epsilons_right_' + str(epoch), epsilons_right)
 
-        if self.name == "transE" or self.name == 'distmult' or self.name == 'complEx':
+        if self.name == "transE" or self.name == 'distmult' or self.name == 'complEx' or self.name == 'rescal':
             emb_E = self.emb_E.weight.detach().cpu().numpy()
             emb_R = self.emb_R.weight.detach().cpu().numpy()
 

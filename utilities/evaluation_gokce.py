@@ -48,12 +48,13 @@ def plot_mse_pos(test_pos_score, test_pos_weights, batch_no):
     data_dir = 'plots/mse_pos_val_batch_' + str(batch_no)
     triple_no = triple_numbers[:120]
     weight_no = weights[:120]
-    score_no =  scores[:120]
+    score_no = scores[:120]
 
-    np.save(str(data_dir)+ '_triples',triple_no )
+    np.save(str(data_dir) + '_triples', triple_no )
     np.save(str(data_dir) + '_weights', weight_no)
     np.save(str(data_dir) + '_scores', score_no)
     return
+
 
 def plot_mse_neg(test_neg_score, batch_no):
     fig_size = plt.rcParams["figure.figsize"]
@@ -89,7 +90,7 @@ def get_mse_pos(model, test_pos, test_batch_size, plot):
         positive_test_triples_size = test_pos.shape[0]
         batch_no = 0
 
-        if model.name == 'UKGE_logi' or model.name == 'WGE_logi' or model.name=='rescal':
+        if model.name == 'UKGE_logi' or model.name == 'WGE_logi' or model.name == 'rescal':
             for iter_triple in test_triples:
                 test_pos_weights = iter_triple[:, 3].astype(np.float64)
                 test_pos_score = model.forward(iter_triple)
