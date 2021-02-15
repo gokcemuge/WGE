@@ -437,14 +437,16 @@ def WGE_loss(self, pos_scores, pos_weights, neg_scores, epsilons_left, epsilons_
     positive_weight = torch.from_numpy(pos_weights).view(1, -1).transpose(0, 1).cuda()
     positive_score = pos_scores.view(1, -1).transpose(0, 1)  # dimensions checked
 
-    pos_indices = torch.arange(0,1).cuda()
-    neg_indices = torch.arange(1,n_neg_samples+1).cuda()
+    #pos_indices = torch.arange(0,1).cuda()
+    #neg_indices = torch.arange(1,n_neg_samples+1).cuda()
 
-    epsilons_left_p = torch.index_select(epsilons_left, 1,  pos_indices)
-    epsilons_left_n = torch.index_select(epsilons_left, 1, neg_indices)
+    #epsilons_left_p = torch.index_select(epsilons_left, 1,  pos_indices)
+    #epsilons_left_n = torch.index_select(epsilons_left, 1, neg_indices)
+    epsilons_left_p = epsilons_left
+    epsilons_left_n = epsilons_left
 
-    epsilons_right_p = torch.index_select(epsilons_right, 1, torch.tensor([0]).cuda())
-    epsilons_right_n = torch.index_select(epsilons_right, 1, neg_indices)
+    epsilons_right_p = epsilons_right
+    epsilons_right_n = epsilons_right
 
     epsilons_left_sqr_p = epsilons_left_p ** 2
     epsilons_right_sqr_p = epsilons_right_p ** 2

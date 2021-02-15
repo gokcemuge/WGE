@@ -252,12 +252,18 @@ def train(name, out_file, model, data_dir, dim, batch_size,
 
             if model.name == "WGE_logi":
 
-                keys = list(zip(iter_triple[:, 0], iter_triple[:, 1], iter_triple[:, 2]))
-                triple_idxs = list(itemgetter(*keys)(kg.triple2idx))  # select triples to be used in loss
+                keys = list(iter_triple[:, 2])# only rels
+
+                #rel_idxs = list(itemgetter(*keys)(kg.rel2id_dict))  # if they are not in ids
+
                 #triple_idxs = list(map(str, triple_idxs))  # keys to string
 
-                epsilons_left_batch = model.epsilons_left(torch.tensor(triple_idxs).cuda())
-                epsilons_right_batch = model.epsilons_right(torch.tensor(triple_idxs).cuda())
+                epsilons_left_batch = model.epsilons_left(torch.tensor(keys).long().cuda())
+                epsilons_right_batch = model.epsilons_right(torch.tensor(keys).long().cuda())
+
+
+                #epsilons_left_batch = model.epsilons_left(torch.tensor(triple_idxs).cuda())
+                #epsilons_right_batch = model.epsilons_right(torch.tensor(triple_idxs).cuda())
 
                 pos_score = model.forward(iter_triple)
                 neg_score = model.forward(iter_neg)  # when the model rect, bound is needed after forward
@@ -563,12 +569,12 @@ if __name__ == '__main__':
     train_with_psl = True
 
     '''
-    '''
-    model_name = "NEW_logi"
+
+    model_name = "WGE_logi"
     lr = 0.001
     validate_epoch = 50
     test_epoch = 50
-    max_epoch = 300
+    max_epoch = 50
     plot = False
     batch_size = 512
     dim = 128
@@ -577,7 +583,7 @@ if __name__ == '__main__':
     ndcg_check = True
     train_with_psl = False
     train_with_groundings = False
-    '''
+
 
     '''
     model_name = "UKGE_rect"

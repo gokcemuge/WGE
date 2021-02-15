@@ -51,6 +51,7 @@ class KnowledgeGraph:
 
         # for triple specific slack variables
         self.triple2idx = {}
+        self.rel2idx = {}
 
         '''load dicts and triples'''
         self.load_dicts()
