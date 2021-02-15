@@ -570,6 +570,7 @@ if __name__ == '__main__':
 
     '''
 
+    '''
     model_name = "WGE_logi"
     lr = 0.001
     validate_epoch = 50
@@ -583,7 +584,7 @@ if __name__ == '__main__':
     ndcg_check = True
     train_with_psl = False
     train_with_groundings = False
-
+    '''
 
     '''
     model_name = "UKGE_rect"
