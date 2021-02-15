@@ -70,8 +70,9 @@ def train(name, out_file, model, data_dir, dim, batch_size,
     print("save_model: ", model.save_model)
 
     strong_threshold = 0.85
-    if kg.dataset_name == 'ppi5k':
-        strong_threshold = 0.70
+    # in paper version, threshold is the same for all datasets including ppi5k
+    # if kg.dataset_name == 'ppi5k':
+    #    strong_threshold = 0.70
     print("threshold for strong facts: ", strong_threshold)
     print(". . . . ")
 
