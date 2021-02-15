@@ -301,8 +301,8 @@ class Model(nn.Module):
             xavier_normal_(self.emb_E.weight.data)
             xavier_normal_(self.emb_R.weight.data)
 
-            self.epsilons_left = torch.nn.Embedding(self.kg.n_training_triple, (self.neg_size + 1), padding_idx=0).double()
-            self.epsilons_right = torch.nn.Embedding(self.kg.n_training_triple, (self.neg_size +1), padding_idx=0).double()
+            self.epsilons_left = torch.nn.Embedding(self.kg.n_relation, 1, padding_idx=0).double()
+            self.epsilons_right = torch.nn.Embedding(self.kg.n_relation, 1, padding_idx=0).double()
 
             xavier_normal_(self.epsilons_left.weight.data)
             xavier_normal_(self.epsilons_right.weight.data)
